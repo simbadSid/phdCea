@@ -1,0 +1,277 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+\documentclass[12pt]{article}											% font size
+
+\usepackage{amssymb}
+\usepackage{amsmath,amsfonts}
+\usepackage{subfig}
+\usepackage{graphicx}													% to include images
+\usepackage{float}														% to float figures
+\usepackage{booktabs,makecell}											% for diagonal cells
+\usepackage{hyperref}													% for hyperlinks
+\usepackage{listings}													% for including files
+\usepackage[top=1in, bottom=1in, left=1.25in, right=1.25in]{geometry}	% set margins
+\usepackage[utf8]{inputenc}												% for unicode input characters
+\usepackage{helvet}														% use helvetica per default
+\usepackage{hyperref}													% for hyperlinks
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{color}
+
+\renewcommand{\familydefault}{\sfdefault}								% use sans serif per default
+
+\definecolor{codegreen}{rgb}{0,0.6,0}									%New colors defined below
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{												%Code listing style named "mystyle"
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+\lstset{style=mystyle}													%"mystyle" code listing set
+
+% ----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+% ----------------------------------------------------------------------------------------
+
+\makeatletter
+\makeatother
+\renewcommand{\familydefault}{\sfdefault}								% use sans serif per default
+\makeatother
+\title
+{
+	Machine learning\\
+    \emph{Theoretical Views of Boosting}
+}
+\author{Riyane SID-LAKHDAR}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In this document, we refer to the paper of Robert E. Schapir \cite{mainPaper} in order to prove that the AdaBoost algorithm is indeed a "boosting" algorithm.    Our demonstration is based on the steps described on slide 50 of the lecture (all the questions have been considered and fulfilled).
+\end{abstract}
+\tableofcontents
+\newpage
+
+\section{Motivation and scope of the study}
+\subsection{AdaBoost algorithm: An example of boosting algorithm}
+The AdaBoost algorithm belongs to the set of boosting algorithms.   This kind of learning algorithms are based on the following principle:  Assuming a set of input weak classifier (with relatively high respective empirical risks), it builds an output classifier with a lower empirical risk.   In this document, we prove that the empirical risk of the AdaBoost output classifier drops exponentially with the number of weak classifiers (assuming each weak classifier is slightly better than random).
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Scope and limits}
+In the paper of Robert E. Schapir \cite{mainPaper}, an implementation of the AdaBoost algorithm is presented.   This algorithm only considers building binary classifiers (using vectors with output set $= [+1, -1]$).
+
+One of the limits of the current study is that it only considers the evolution and the convergence of the empirical risk  of the output classifier on the considered training set.   We do not consider any aspect of its generalization to the hall set of possible input points (generalization error).
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Used notations}
+In the rest of the document, we use the following notations.
+\begin{itemize}
+	\item $m$: Size of the training set.
+	\item $T$: Number of iterations (or classifiers to be combined) in the AdaBoost algorithm execution.
+	\item $H(x)$: Prediction of the output AdaBoost classifier for an input x.
+	\item $F(x)$: Prediction of the output AdaBoost classifier for an input x, transposed to the binary output space $[+1, -1]$ ($F(x) = sign(H(x))$).
+	\item $D_t(i)$:  Distribution probability of the training point i at the iteration t.
+	\item $\alpha_t$: weight of the $t^{th}$ weak classifier in the output classifier of the AdaBoost algorithm.
+	\item $Z_t$: Normalisation term of the weak classifier t, with respect to the combination weights.
+    \item $1_{E_0 rel E_1}$ is the function that associates to the elements $E_0$ and $E_1$ the value 1 if the relation $rel$ between $E_0$ and $E_1$ is verified, and 0 otherwise.
+\end{itemize}
+
+
+
+%----------------------------------------------------------------------------------------
+%
+%----------------------------------------------------------------------------------------
+\section{Analyse of the AdaBoost algorithm }
+\subsection{Bounding the training error}
+In this section, we prove that the empirical risk $\sum_{i=1}^{m} {1_{y_i \neq F(x_i)}}$ of a binary classifier $F$ computed by the AdaBoost algorithm, is bounded as follows: 
+	\begin{equation}
+	\begin{aligned}
+		\frac{1}{m} * \sum_{i=1}^{m} {1_{y_i \neq F(x_i)}} \leq \prod_{t=1}^{T}{Z_t}
+        \label{equation:boundedTrainingError}
+	\end{aligned}
+	\end{equation}
+
+
+First, we can notice that for a classifier H computed by the AdaBoost algorith and for each training sample $(x_i, y_i)$, either
+	\begin{itemize}
+		\item $y_i = sign(H(x_i))$.   Thus $\exp^{- y_i H(x_i)} \in ]0, 1[$.   Hence $1_{y_i \neq H(x_i)} = 0 \leq \exp^{- y_i H(x_i)}$
+    \end{itemize}
+or
+	\begin{itemize}
+		\item $y_i \neq sign(H(x_i))$.   Thus $\exp^{- y_i H(x_i)} \geq 1$.   Hence Hence $1_{y_i \neq H(x_i)} = 1 \leq \exp^{- y_i H(x_i)}$
+	\end{itemize}
+Thus, $\forall i \in [1, m], 1_{y_i \neq sign(H(x))} \leq {\exp^{-y_i H(x_i)}}$.   As each of this elements is positive and as m is positive, we have
+	\begin{equation}
+	\begin{aligned}
+		\frac{1}{m} * \sum_{i=1}^{m} 	{1_{y_i \neq F(x_i)}} & \leq \frac{1}{m} * \sum_{i=1}^{m}{\exp^{-y_i H(x_i)}}
+        \label{inequality:boundedTrainingError}
+	\end{aligned}
+	\end{equation}
+Meanwhile, we can notice by definition of the function H that for each training sample $(x_i, y_i)$
+	\begin{equation*}
+	\begin{aligned}
+			\sum_{i=1}^{m}{\exp^{-y_i H(x_i)}}	&= \sum_{i=1}^{m}{\exp^{-y_i  \sum_{t=1}^{T}{\alpha_t f_t(x_i) }  }} 
+												= \sum_{i=1}^{m}{\prod_{t=1}^{T}{\exp^{-y_i \alpha_t f_t(x_i)} }} \\
+												&= \sum_{i=1}^{m}{[\exp^{-y_i \alpha_1 f_1(x_i)} * \prod_{t>1}^{T}{\exp^{-y_i \alpha_t f_t(x_i)} }]}
+	\label{equation:partialBound}
+	\end{aligned}
+	\end{equation*}
+We can also notice by definition of the AdaBoost algorithm that $\forall i \in [1, m]$
+	\begin{equation*}
+	\begin{aligned}
+		D_2(i)	&= \frac{D_1(i) \exp^{-\alpha_1 y_i * f_1(x_i)}}{Z_1} 
+				= \frac{\frac{1}{m} \exp^{-\alpha_1 y_i * f_1(x_i)}}{Z_1} \\
+         Hence \\
+		\exp^{-\alpha_1 y_i * f_1(x_i)}		&= m * Z_1 * D_2(i)
+	\end{aligned}
+	\end{equation*}
+Thus
+	\begin{equation*}
+	\begin{aligned}
+			\frac{1}{m} \sum_{i=1}^{m}{\exp^{-y_i H(x_i)}}	&= \sum_{i=1}^{m}{[Z_1 * D_2(i) * \prod_{t>1}^{T}{\exp^{-y_i \alpha_t f_t(x_i)} }]}\\
+															&= \sum_{i=1}^{m}{[Z_1 * D_2(i) * \prod_{t>1}^{T}{[D_{t+1}(i)Z_t ]}]}  \mbox{   by definition of } D_{t}\\
+                                                            &= \sum_{i=1}^{m}{\prod_{t=1}^{T}{[D_{t+1}(i)Z_t] }}
+                                                            = \sum_{i=1}^{m}{[[\prod_{t=1}^{T}{Z_t }] * [\prod_{t=1}^{T}{D_{t+1}(i)}] ]}\\
+                                                            &= \prod_{t=1}^{T}{Z_t } * \sum_{i=1}^{m}{\prod_{t=1}^{T}{D_{t+1}(i)} }\\
+			\frac{1}{m} \sum_{i=1}^{m}{\exp^{-y_i H(x_i)}}	&= \prod_{t=1}^{T}{Z_t } \mbox{  See: \footnotemark[2]}
+	\end{aligned}
+	\end{equation*}
+\footnotetext[2]{The equality $\sum_{i=1}^{m}{\prod_{t=1}^{T}{D_{t+1}(i)} = 1}$ is obviously wrong (some of the products of a non constant probability).   The error that occurs here comes probably from the fact that the parameter t is not well bounded in this expression.}
+Finally, by combining the previous equation with the inequality \ref{inequality:boundedTrainingError}, we can reach the announced equation \ref{equation:boundedTrainingError}.
+
+
+
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Minimizing the upper bound of the training error}
+Thanks to the equation \ref{equation:boundedTrainingError}, we know that for a given set $\{\alpha_t\}_{t \in [1, T]}$, an upper bound of the training error of the AdaBoost algorithm is $\prod_{t=1}^{T}{Z_t}$.   Thus, in order to minimize this training error, we could find the set $\{\alpha_t\}_{t \in [1, T]}$ that minimizes $\prod_{t=1}^{T}{Z_t}$.\\
+For each $t \in [1, T]$, we know by definition that  $Z_t$ is positive.   Thus, in this section, we minimize $\prod_{t=1}^{T}{Z_t}$ by minimizing $Z_t$ for each t (not the optimal way). \\
+First, by definition of $Z_t$, we have 
+	\begin{equation}
+	\begin{aligned}
+    	Z_t(\alpha_t)	&= \sum_{i=1}^{m}{D_t(i)\exp^{-\alpha_t y_i f_t(x_i)}}
+        								=  \sum_{\substack{i=1 \\ y_i = f_t(x_i)}}^{m}{D_t(i)\exp^{-\alpha_t y_i f_t(x_i)}}  +  \sum_{\substack{i=1 \\ y_i \neq f_t(x_i)}}^{m}{D_t(i)\exp^{-\alpha_t y_i f_t(x_i)}}\\
+        								&=  \sum_{\substack{i=1 \\ y_i = f_t(x_i)}}^{m}{D_t(i)\exp^{-\alpha_t}}  +  \sum_{\substack{i=1 \\ y_i \neq f_t(x_i)}}^{m}{D_t(i)\exp^{\alpha_t}} \mbox{  See: \footnotemark[1]}\\
+        								&=  \exp^{-\alpha_t} \sum_{\substack{i=1 \\ y_i = f_t(x_i)}}^{m}{D_t(i)}  +  \exp^{\alpha_t} \sum_{\substack{i=1 \\ y_i \neq f_t(x_i)}}^{m}{D_t(i)} \\
+    	Z_t(\alpha_t)	&=  (1 - \epsilon_t) \exp^{-\alpha_t}  + \epsilon_t \exp^{\alpha_t} \mbox{  By definition of  } \epsilon_t \\
+     \label{equation:Zt(alphat)}
+	\end{aligned}
+	\end{equation}
+\footnotetext[1]{If $y_i == f_t(x_i)$ then $y_i f_t(x_i) =1$, else $y_i f_t(x_i) = -1$}
+Second, we can notice on the equation \ref{equation:Zt(alphat)} that the function $Z_t$ is derivable with respect to $\alpha_t$ ($\epsilon_t$ does not depend on $\alpha_t$ and the exponential function is derivable on its hole definition interval).   As $Z_t$is continue, the values $\alpha_t$ $Z_t$ reaches an extremum are the solutions of the equation
+	\begin{equation}
+	\begin{aligned}
+		\frac{dZ_t}{d\alpha_t} (\alpha_t)																  &= 0\\
+		\epsilon_t \exp^{\alpha_t} + (\epsilon_t - 1) \exp^{- \alpha_t}	  &= 0\\
+		\epsilon_t + (\epsilon_t - 1) \exp^{-2 \alpha_t}									&= 0 \mbox{ cause } \exp^{\alpha_t} \neq 0\\
+        \exp^{-2 \alpha_t}																									&= \frac{\epsilon_t }{1 - \epsilon_t }\\
+        -2 \alpha_t																													&= ln(\frac{\epsilon_t }{1 - \epsilon_t })\\
+        \alpha_t																													  &= \frac{-1}{2} ln(\frac{\epsilon_t }{1 - \epsilon_t })  = \frac{1}{2} ln((\frac{\epsilon_t }{1 - \epsilon_t })^{-1}) \\
+        \alpha_t																													  &= \frac{1}{2} ln(\frac{1-\epsilon_t }{\epsilon_t })
+	\end{aligned}
+	\end{equation}
+As this solution is unique, the function $Z_t$ has a unique extremum reached for 
+\begin{equation}
+	\alpha_t = \alpha_t^* = \frac{1}{2} ln(\frac{1-\epsilon_t }{\epsilon_t })
+    \label{uniqueExtremum}. 
+\end{equation}
+Furthermore, 
+	\begin{equation}
+	\begin{aligned}
+		\frac{dZ_t}{d\alpha_t} (\alpha_t)  & \underset{\alpha_t \rightarrow + \infty}{\approx} \quad \exp^{\alpha_t} - \exp^{- \alpha_t} \mbox{ Cause } \epsilon_t \in ]0, 1[ \mbox{ , hence } \epsilon_t -1 < 0\\
+			&\underset{\alpha_t \rightarrow + \infty}{\approx} \quad +\infty - 0 = +\infty
+		\label{positiveLimitInfinity}
+	\end{aligned}
+	\end{equation}
+Thus, as $Z_t$ is continue with respect to $\alpha_t$, we can deduce from \ref{uniqueExtremum} and \ref{positiveLimitInfinity} that $\alpha_t = \alpha_t^* = \frac{1}{2} ln(\frac{1-\epsilon_t }{\epsilon_t })$ is a minimum of $Z_t$.
+
+
+
+
+
+
+
+
+
+
+%----------------------------------------------------------------------------------------
+\subsection{Minimizing the training error}
+By choosing $\alpha_t = \alpha_t^*$ we are not sure to reach the minimal value of the training error.   However, we are sure that the training error will be smaller that $Z_t(\alpha_t^*)$.   In this section, we choose $\alpha_t = \alpha_t*$ and we show that if the empirical error $\epsilon_t$ of each weak classifier is slightly better than random ($\epsilon_t < 1/2$)  then the training error decreases exponentially to 0 with the number of weak classifiers (T).\\
+In this section we also suppose proved the result $(6): \forall t \in [1, T], Z_t = \sqrt{1 - 4 \gamma_t^2}$.\\
+First, let's prove, by reduction to the absurd, that $\sqrt{1 - 4 \gamma_t^2} \leq \exp^{-2 \gamma_t ^2}$
+	\begin{equation}
+	\begin{aligned}
+		\sqrt{1 - 4 \gamma_t^2}										 & > \exp^{-2 \gamma_t ^2}\\
+		\exp^{\frac{1}{2}ln(1 - 4 \gamma_t^2)}		& > \exp^{-2 \gamma_t ^2} 	 \mbox{ Exponential form of the power function}\\
+		\frac{1}{2}ln(1 - 4 \gamma_t^2)						 & > -2 \gamma_t ^2 					\mbox{ Cause exp continue and strictly increasing}\\
+		ln(1 - 4 \gamma_t^2)						 					& > -4 \gamma_t ^2\\
+		1 - 4 \gamma_t^2								 					& > \exp^{-4 \gamma_t ^2}\\
+     \label{equation:maxZt}
+	\end{aligned}
+	\end{equation}
+Which is absurd because $\forall x \in \mathbb{R}$, the function $x\rightarrow (1-4x)$ is greater or equal than the exponential function.\\
+Thus, $\forall t \in [1, T], Z_t   \leq \exp^{-2 \gamma_t ^2}$.\\
+Furthermore, we can notice that:
+\begin{equation*}
+	\begin{aligned}
+		\prod_{t=1}^{T}{\sqrt{1 - 4 \gamma_t ^2}}	&= \prod_{t=1}^{T}{\exp^{\frac{1}{2} ln(1 - 4 \gamma_t ^ 2)    }        }  = \exp^{\frac{1}{2} \sum_{t=1}^{T}{ln(1-4 \gamma_t ^2)}  }  \\
+    																									&= \exp^{\frac{1}{2} ln(\prod_{t=1}^{T}{1-4\gamma_t ^2} )  }   =  \exp^{\frac{1}{2} \sum_{t=1}^{T}{ln(Z_t ^2)} }  \\
+                                                                                                        &= \exp^{\sum_{t=1}^{T}{ln(Z_t)} }\\
+	\end{aligned}
+    \end{equation*}
+But we know that $\forall x, y \in \mathbb{R}^+$ ,  $x <= y \Rightarrow  ln(x) \leq ln(y)$.   Thus \ref{equation:maxZt} induce:  $\sum_{t=1}^{T}{ln(Z_t)}  \leq \sum_{t=1}^{T}{ln(\exp^{-2 \gamma_t ^2} )}$  $ = \sum_{t=1}^{T}{-2 \gamma_t ^2}$.   Thus:
+	\begin{equation}
+    \begin{aligned}
+		\prod_{t=1}^{T}{\sqrt{1 - 4 \gamma_t ^2}}	&\leq \exp^{\sum_{t=1}^{T}{-2 \gamma_t ^2  } } = \prod_{t=1}^{T}{\exp^{-2 \gamma_t ^2 } } \\ 
+		\prod_{t=1}^{T}{\sqrt{1 - 4 \gamma_t ^2}}	& \leq \exp^{\sum_{t=1}^{T}{-2 \gamma_t ^2} }  = \prod_{t=1}^{T}{\exp^{-2 \gamma_t ^2} } \\
+        Hence: \\                                                                                                 
+ 		EmpiricalMisclassification \leq m   \prod_{t=1}^{T}{Z_t}	&  \leq m \prod_{t=1}^{t} {\exp^{-2 \sum_{t=1}^{T}{\gamma_t ^2}}}  \\
+     \label{equation:maxEmpiricalRisk}
+	\end{aligned}
+	\end{equation}
+    
+%----------------------------------------------------------------------------------------
+%
+%----------------------------------------------------------------------------------------
+\section{Interpretation}
+Let assume that $\alpha_t = \alpha_t^*$ for each step t of the AdaBoost algorithm.   Thanks to the equation \ref{equation:maxEmpiricalRisk}, we can deduce that each time we process an addition step t in the AdaBoost algorithm, the empirical risk is divided by $E_t = \exp^{1 - 2 \epsilon_t}$.   Thus if the empirical risk of the weak classifier t is slightly better than random ($\epsilon_t < \frac{1}{2}$), $E_t > 1$.\\
+In this conditions, he training error of the AdaBoost output classifier drops exponentially fast with the number of iterations.\\
+
+The AdaBoost algorithm may then be described as a boosting algorithm: it takes a set of input weak classifiers (with respective empirical risks slightly better than random) and outputs a classifier with a much better (proportionally) empirical risk.\\
+
+
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+\nocite{*}
+\small{\bibliographystyle{abbrv}
+\bibliography{bibliography.bib}\vspace{0.75in}}
+
+
+\end{document}
