@@ -130,8 +130,6 @@
 	%****** \targetname\space autotuning: done through perf evaluations of different resulting code.   But the code-generation process looks deterministic.   So how can we end up with different variants
 
 
-	%****** Results: no error bar + how is the performance measured: what does (flop/cycle) shows about the perf
-
 %----------------------------------------------------------------------------------------
 %	REFERENCES
 %----------------------------------------------------------------------------------------
