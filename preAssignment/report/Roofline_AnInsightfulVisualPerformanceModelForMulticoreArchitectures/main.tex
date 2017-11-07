@@ -1,0 +1,140 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+\documentclass[11pt]{article}											% font size
+
+\usepackage{amssymb}
+\usepackage{amsmath,amsfonts}
+\usepackage{subfig}
+\usepackage{graphicx}													% to include images
+\usepackage{float}														% to float figures
+\usepackage{booktabs,makecell}											% for diagonal cells
+\usepackage{hyperref}													% for hyperlinks
+\usepackage{listings}													% for including files
+\usepackage[top=1in, bottom=1in, left=1.25in, right=1.25in]{geometry}	% set margins
+\usepackage[utf8]{inputenc}												% for unicode input characters
+\usepackage{helvet}														% use helvetica per default
+\usepackage{hyperref}													% for hyperlinks
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{color}
+
+\renewcommand{\familydefault}{\sfdefault}								% use sans serif per default
+
+\definecolor{codegreen}{rgb}{0,0.6,0}									%New colors defined below
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}												%Code listing style named "mystyle"
+{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}													%"mystyle" code listing set
+
+% ----------------------------------------------------------------------------------------
+%	NOTATIONS
+% ----------------------------------------------------------------------------------------
+	\newcommand{\targetname}	{\emph{Roofline model}}
+
+
+% ----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+% ----------------------------------------------------------------------------------------
+
+\makeatletter
+\makeatother
+\renewcommand{\familydefault}{\sfdefault}								% use sans serif per default
+\makeatother
+\title
+{
+	PhD CEA pre-assignment.   Summarizing the paper: \\
+    \emph{Roofline: an insightful visual performance model for multicore architectures\cite{mainPaper}}
+}
+\author{Riyane SID-LAKHDAR}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+
+
+
+
+
+%\begin{abstract}
+%	This document summarizes, explains and refers to the paper \cite{mainPaper}.   It tries to reflect as transparently as possible
+%\end{abstract}
+
+\tableofcontents
+\newpage
+
+
+
+%----------------------------------------------------------------------------
+\section{Context: performance evaluation of multicore architectures}
+	The emergence of multicore hardware architectures has significantly increased the difficulty to assess the performances of software and kernels.   A simple approximation of the performance of these architectures is thus mandatory to help software developers evaluate their programs and decide which optimization/strategy to implement.
+
+
+%----------------------------------------------------------------------------
+\section{The \targetname}
+	\subsection{Hardware boundaries (roof)}
+	The \targetname\space allows, as a first approximation, to bound the computation (floating-point) performance of a given multicore processor according to its memory-bandwidth performance (expressed using the "operational intensity": operation per byte of DRAM traffic; see section \ref{section:interestOfTheModel}).
+	The \targetname\space indicates for a given kernel (defined by its operational intensity) whether the potential performance bottleneck is the computations or the memory accesses.
+	This upper bound of the considered hardware architecture is built using
+	\begin{itemize}
+		\item The hardware peak floating-point (delivered by the manufacturer), which gives the compute-bound section (constant) of the model.
+		\item The hardware peak memory-bandwidth (delivered by the manufacturer or through micro-benchmarks) and the operational intensity (specific to a kernel or a program).  These give the memory-bound section of the model.
+	\end{itemize}
+
+
+
+	\subsection{Fitting the model to the memory/computational optimizations (ceiling)}
+	In order to model more accurately the performance of a kernel\footnote{Running on the considered hardware}, the \targetname\space allows to enhance (reduce) the previously defined boundary according to the optimizations\footnote{Memory (ex: software prefetching, thread affinity) or computational optimization (ex: improve instruction parallelism)} implemented by the software:   each optimization is mapped to the threshold curve that it potentially allows to surpass.   The objective being to rank these optimizations based on the corresponding potential gain (and determine the ones that would have no impact).
+
+
+%----------------------------------------------------------------------------
+\section{Interest of the model}\label{section:interestOfTheModel}
+	The main interest of the \targetname\space is its user-friendliness: the developer may simply generate a performance approximation of his software and host hardware;   this brings a precious help to identify the software optimizations that worth being implemented.\\
+	Meanwhile, the \targetname\space allows a relatively accurate evaluation of the impact of memory on the considered performances:   The model considers the exchanges between the DRAM and the caches to measure the memory impact.   Indeed, these exchanges are most often much slower than the exchanges between the processor and the caches.   The DRAM-caches exchanges are thus more likely to represent the bottleneck resource.
+
+	
+	
+%	Indeed, the model considers the exchanges between the DRAM and the caches as a measure of the memory impact.   And this access is most often longer than an access between the processor and the caches (excluding DMA processors).   It might thus more likely represent a bottleneck resource.
+
+
+%----------------------------------------------------------------------------
+%\section{Limitation}
+%	***** No impact of memory optimisations on the computational ones (vice-versa).
+%	In the \targetname, the upper-bound linked to each memory optimization (ceiling) is presented as having no impact on the performances of the computation optimizations.   Indeed, memory optimisations might very likely be done through extra computations (trade-off between computation and memory).   Thus, these optimisations might compete with the payload computations.   Hence, reduce the peak floating-point performance.\\
+%	However, the impact of these memory optimisations is reflected on the increase of the computation required to reach the peak floating-point performances (steady-state).   This increase is observable through the operational intensity.
+
+%	***** No impact of memory optimisations on the operation intensity of the kernel.
+
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+\newpage
+\nocite{*}
+\small{\bibliographystyle{abbrv}
+\bibliography{bibliography.bib}\vspace{0.75in}}
+
+
+\end{document}
